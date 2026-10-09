@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>LISE++ file checker</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        html {
+            font-size: 62.5%;
+        }
+
+        body {
+            font-size: 16px;
+            font-size: 1.6rem;
+            font-family: arial;
+            font-weight: 100;
+            text-size-adjust: 100%;
+            margin: 20px;
+        }
+
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #output {
+            font-size: large;
+        }
+        #input {
+            font-size: large;
+        }
+
+        #contact-info {
+            font-size: 12px;
+            font-size: 1.2rem;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            margin: 20px;
+            background-color: #f8f8f8;
+            padding: 10px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            border: none;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        table td, table th {
+            border: none;
+            font-family: monospace;
+            white-space: pre;
+        }
+        td:nth-child(1) {
+            width: 17ch;
+        }
+        td:nth-child(2) {
+            padding-right: 4ch;
+        }
+        .cell {
+            stroke: #ccc;
+            stroke-width: 1px;
+        }
+        .label {
+            font-size: 10px;
+            text-anchor: middle;
+            fill: black;
+            stroke: white;
+            stroke-width: 2px;
+            paint-order: stroke;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="contact-info">
+        Contact: <a href="mailto:masahiro.yoshimoto@riken.jp">M. Yoshimoto</a>
+    </div>
+    <div id="drop-area">
+        <label for="file-input">Drop or select a LISE++ lpp file</label>
+        <input type="file" id="file-input" style="display: none; cursor: pointer;" accept=".lpp">
+        <div id="drop-filename"></div>
+    </div>
+
+    <div id="output"></div>
+    <form id="data-selector" style="display: flex; gap: 1em; align-items: center;">
+        <div>
+            <label>
+                <input type="radio" name="metric" value="rate" checked>
+                Rate (cps)
+            </label>
+            <label>
+                <input type="radio" name="metric" value="transmission">
+                Transmission (%)
+            </label>
+            <label>
+                <input type="radio" name="metric" value="crossSection">
+                Cross Section (mb)
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="scale" value="linear" checked>
+                Linear
+            </label>
+            <label>
+                <input type="radio" name="scale" value="log">
+                Log (6 orders)
+            </label>
+        </div>
+    </form>
+    <svg id="chart"></svg>
+    <pre id="input"></pre>
+
+    <script src="lisechecker.js"></script>
+</body>
+
+</html>
