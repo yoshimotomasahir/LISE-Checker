@@ -31,6 +31,20 @@ const targetThicknessesW = [0.1, 0.2, 0.3, 0.5, 1, 1.4, 2.1, 2.8];
 
 const beamDumpApiUrl = "https://script.google.com/macros/s/AKfycbyzGZokl4P6YV3OuzEa6RmNsSsGj3dHelzlOhH4k8YPcrekterTi96GmdDNrfdjYjqZNQ/exec";
 
+const standard3EERParameters = {
+    "HML_show": ["7"],
+    "AF_Ex_choice": ["0"],
+    "BoundaryLow": ["40 MeV"],
+    "BoundaryHigh": ["180 MeV"],
+    "Velocity": ["1"],
+    "LowEx_nucleus": ["236U 92+", "236U"],
+    "L_CS_Ex": ["1.927e+02 23.50 11.24"],
+    "MidEx_nucleus": ["226Th90+", "226Th"],
+    "M_CS_Ex": ["5.000e+02 100.00 53.06"],
+    "HighEx_nucleus": ["220Ra88+", "220Ra"],
+    "H_CS_Ex": ["3.500e+02 250.00 64.40"]
+};
+
 const wedgeValidSettingsF1 = [
     { symbol: "Al", thickness: 1.0, angle: -1.212 },
     { symbol: "Al", thickness: 1.4, angle: -1.76 },
@@ -263,6 +277,10 @@ function readLiseLppFile(obj) {
 
     text += `<tr><td>User CS\t\t</td><td>${getCrossSection(obj, fragment)} mb for ${fragment}</td><td></td></tr>`;
     text += `<tr><td>Reaction Mech.\t</td><td>${getReactionMechanism(obj)}</td><td></td></tr>`;
+    if (obj["mechanism"]["Reaction"] === "4") {
+        const result3EER = check3EERParameters(obj);
+        text += `<tr><td>3EER parameters\t</td><td><span title="${escapeHtmlAttribute(result3EER.details)}">${result3EER.description}</span></td><td><b><a href="https://doi.org/10.1016/j.nimb.2013.08.049" target="_blank">${result3EER.status}</a></b></td></tr>`;
+    }
     text += `<tr><td>Cross-section model\t</td><td>${getEPAXCrossSection(obj)}</td><td></td></tr>`;
     text += `<tr><td>CentralCut\t</td><td>${getCentralCut(obj)}</td><td><b><a href="https://www.nishina.riken.jp/ribf/BigRIPS/intensity.html" target="_blank">${checkCentralCut(obj)}</b></a></td></tr>`;
     text += "</table>";
@@ -640,6 +658,23 @@ function getReactionMechanism(obj) {
         return "Abrasion-Fission";
     }
     else { return "Not supported"; }
+}
+
+function check3EERParameters(obj) {
+    const parameters = obj["abrasion_fission"];
+    const parameterDetails = Object.entries(standard3EERParameters)
+        .map(([key, values]) => `${key}: ${parameters?.[key] ?? "missing"} (expected: ${values.join(" or ")})`);
+    const matched = Object.entries(standard3EERParameters)
+        .every(([key, values]) => values.includes(parameters?.[key]));
+    return {
+        status: matched ? "OK" : "NG",
+        description: matched ? "Matches Suzuki et al. (2013)" : "Does not match Suzuki et al. (2013)",
+        details: parameterDetails.join("\n")
+    };
+}
+
+function escapeHtmlAttribute(value) {
+    return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function getEPAXCrossSection(obj) {
