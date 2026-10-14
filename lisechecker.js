@@ -186,15 +186,20 @@ function handleFile(file) {
             }
         }
         input.innerHTML = JSON.stringify(obj, null, " ");
+        output.innerHTML = "";
+        isotopeData = [];
+        d3.select("#chart").selectAll("*").remove();
 
-        output.innerHTML = "Error";
-        let text = "<table>";
-        text += `<tr><td>File Name\t</td><td><small>${file.name}</small></td><td></td></tr>`;
-        result = readLiseLppFile(obj);
-        text += result.text;
-        isotopeData = result.isotopeData;
-        displayTable();
-        output.innerHTML = text;
+        // Render the parsed JSON before starting the blocking beam dump request.
+        requestAnimationFrame(() => setTimeout(() => {
+            let text = "<table>";
+            text += `<tr><td>File Name\t</td><td><small>${file.name}</small></td><td></td></tr>`;
+            const result = readLiseLppFile(obj);
+            text += result.text;
+            isotopeData = result.isotopeData;
+            displayTable();
+            output.innerHTML = text;
+        }, 0));
     };
     reader.readAsText(file, 'windows-1252');
 }
