@@ -31,10 +31,52 @@ const targetThicknessesW = [0.1, 0.2, 0.3, 0.5, 1, 1.4, 2.1, 2.8];
 
 const beamDumpApiUrl = "https://script.google.com/macros/s/AKfycbyzGZokl4P6YV3OuzEa6RmNsSsGj3dHelzlOhH4k8YPcrekterTi96GmdDNrfdjYjqZNQ/exec";
 
-const wedgeValidThicknessesF1 = [1.0, 1.4, 2, 3, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 0.3, 0.5, 1.0, 1.2, 2];
-const wedgeValidAnglesF1 = [1.212, 1.76, 2.44, 3.6069, 3.61, 4.2, 4.75, 5.35, 5.986, 7.31, 8.465, 9.845, 10.751, 12.419, 13.177, 15.082, 18.66, 25, 0.356, 0.62, 1.212, 1.38, 2.24];
-const wedgeValidThicknessesF5 = [1.5, 2, 2.2, 2.5, 3, 3.5, 3.5, 4.5, 5, 7, 8, 9, 10, 0.7, 1, 1]
-const wedgeValidAnglesF5 = [1.187, 1.6, 1.8, 2.14, 2.62, 2.8, 3, 3.7, 4.25, 5.969, 7.3129, 7.714, 8.587, 0.61, 0.43, 0.95]
+const wedgeValidSettingsF1 = [
+    { symbol: "Al", thickness: 1.0, angle: -1.212 },
+    { symbol: "Al", thickness: 1.4, angle: -1.76 },
+    { symbol: "Al", thickness: 2, angle: -2.44 },
+    { symbol: "Al", thickness: 3, angle: -3.6069 },
+    { symbol: "Al", thickness: 3, angle: -3.61 },
+    { symbol: "Al", thickness: 3.5, angle: -4.2 },
+    { symbol: "Al", thickness: 4, angle: -4.75 },
+    { symbol: "Al", thickness: 4.5, angle: -5.35 },
+    { symbol: "Al", thickness: 5, angle: -5.986 },
+    { symbol: "Al", thickness: 6, angle: -7.31 },
+    { symbol: "Al", thickness: 7, angle: -8.465 },
+    { symbol: "Al", thickness: 8, angle: -9.845 },
+    { symbol: "Al", thickness: 9, angle: -10.751 },
+    { symbol: "Al", thickness: 10, angle: -12.419 },
+    { symbol: "Al", thickness: 11, angle: -13.177 },
+    { symbol: "Al", thickness: 12, angle: -15.082 },
+    { symbol: "Al", thickness: 15, angle: -18.66 },
+    { symbol: "Al", thickness: 20, angle: -25 },
+    { symbol: "Al", thickness: 0.3, angle: -0.356 },
+    { symbol: "Al", thickness: 0.5, angle: -0.62 },
+    { symbol: "Al", thickness: 1.0, angle: -1.212 },
+    { symbol: "Al", thickness: 1.2, angle: -1.38 },
+    { symbol: "Al", thickness: 2, angle: -2.24 },
+    { symbol: "Al", thickness: 0.446, angle: -0.51 },
+    { symbol: "Ta", thickness: 0.110, angle: -0.126 },
+    { symbol: "Ta", thickness: 0.010, angle: 0 }
+];
+const wedgeValidSettingsF5 = [
+    { symbol: "Al", thickness: 1.5, angle: 1.187 },
+    { symbol: "Al", thickness: 2, angle: 1.6 },
+    { symbol: "Al", thickness: 2.2, angle: 1.8 },
+    { symbol: "Al", thickness: 2.5, angle: 2.14 },
+    { symbol: "Al", thickness: 3, angle: 2.62 },
+    { symbol: "Al", thickness: 3.5, angle: 2.8 },
+    { symbol: "Al", thickness: 3.5, angle: 3 },
+    { symbol: "Al", thickness: 4.5, angle: 3.7 },
+    { symbol: "Al", thickness: 5, angle: 4.25 },
+    { symbol: "Al", thickness: 7, angle: 5.969 },
+    { symbol: "Al", thickness: 8, angle: 7.3129 },
+    { symbol: "Al", thickness: 9, angle: 7.714 },
+    { symbol: "Al", thickness: 10, angle: 8.587 },
+    { symbol: "Al", thickness: 0.7, angle: 0.61 },
+    { symbol: "Al", thickness: 1, angle: 0.43 },
+    { symbol: "Al", thickness: 1, angle: 0.95 }
+];
 
 const dropArea = document.getElementById('drop-area');
 const dropFilename = document.getElementById('drop-filename');
@@ -399,30 +441,19 @@ function checkWedgeInfo(obj) {
     for (let j = 0; j < 2; j++) {
         let results = (j === 0) ? resultsF1 : resultsF5;
         if (results === null) { judges.push("---"); continue; }
-        if (results[2] === "Not supported") { judges.push("Angle not supported"); continue; }
-        let focal = (j === 0) ? "F1" : "F5";
-        symbol = results.symbol;
-        thickness = results.thickness;
-        angle = results.angle.split(" ")[0];
-        angleUnit = results.angle.split(" ")[1];
+        if (results.angle === "Not supported") { judges.push("Angle not supported"); continue; }
+        const symbol = results.symbol;
+        const thickness = results.thickness;
+        const [angle, angleUnit] = results.angle.split(" ");
         if (angleUnit != "mrad") { judges.push("NG"); continue; }
-        if (symbol != "Al") { judges.push("NG"); continue; }
+
+        const validSettings = (j === 0) ? wedgeValidSettingsF1 : wedgeValidSettingsF5;
         let judge = "Not listed";
-        let validThicknesses = [];
-        let validAngles = [];
-        let sign = 0;
-        if (focal === "F1") {
-            validThicknesses = wedgeValidThicknessesF1;
-            validAngles = wedgeValidAnglesF1;
-            sign = -1;
-        }
-        else if (focal === "F5") {
-            validThicknesses = wedgeValidThicknessesF5;
-            validAngles = wedgeValidAnglesF5;
-            sign = 1;
-        }
-        for (let i = 0; i < validThicknesses.length; i++) {
-            if (thickness == validThicknesses[i] && parseFloat(angle.split(" ")[0]) == validAngles[i] * sign) { judge = "OK"; break; }
+        for (const setting of validSettings) {
+            if (symbol === setting.symbol && thickness == setting.thickness && parseFloat(angle) == setting.angle) {
+                judge = "OK";
+                break;
+            }
         }
         judges.push(judge);
     }
