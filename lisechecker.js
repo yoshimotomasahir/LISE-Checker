@@ -216,8 +216,8 @@ function readLiseLppFile(obj) {
         const dKey = `D${d + 1}_General`;
         if (obj[dKey]) {
             return fZ - parseInt(obj[dKey].ZmQ);
-        } else { return NaN; }
-    });
+        } else { return null; }
+    }).filter(q => q !== null);
 
     text += `<tr><td>Primary Beam\t</td><td>${obj["settings"]["A,Z,Q"]} ${obj["settings"]["Energy"]}</td><td></td></tr>`;
     text += `<tr><td>Beam Intensity\t</td><td>${obj["settings"]["Intensity"]}\t</td><td><a href="https://www.nishina.riken.jp/ribf/accelerator/tecinfo.html" target="_blank"><b>${checkPrimaryBeam(obj)}</b></a></td></tr>`;
