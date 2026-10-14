@@ -263,7 +263,7 @@ function readLiseLppFile(obj) {
 
     text += `<tr><td>User CS\t\t</td><td>${getCrossSection(obj, fragment)} mb for ${fragment}</td><td></td></tr>`;
     text += `<tr><td>Reaction Mech.\t</td><td>${getReactionMechanism(obj)}</td><td></td></tr>`;
-    text += `<tr><td>EPAX\t\t</td><td>${getEPAXCrossSection(obj)}</td><td></td></tr>`;
+    text += `<tr><td>Cross-section model\t</td><td>${getEPAXCrossSection(obj)}</td><td></td></tr>`;
     text += `<tr><td>CentralCut\t</td><td>${getCentralCut(obj)}</td><td><b><a href="https://www.nishina.riken.jp/ribf/BigRIPS/intensity.html" target="_blank">${checkCentralCut(obj)}</b></a></td></tr>`;
     text += "</table>";
     text += `<pre>Beam dump calc.\t${beamDumpResults[1]}</pre>`;
@@ -648,6 +648,9 @@ function getEPAXCrossSection(obj) {
     }
     else if (obj["mechanism"]["EPAX Cross Section"] == "2") {
         return "EPAX 2.15";
+    }
+    else if (obj["mechanism"]["EPAX Cross Section"] == "5") {
+        return "FRACS 1.1";
     }
     else { return "Not supported"; }
 }
