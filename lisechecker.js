@@ -282,6 +282,7 @@ function readLiseLppFile(obj) {
         text += `<tr><td>3EER parameters\t</td><td><span title="${escapeHtmlAttribute(result3EER.details)}">${result3EER.description}</span></td><td><b><a href="https://doi.org/10.1016/j.nimb.2013.08.049" target="_blank">${result3EER.status}</a></b></td></tr>`;
     }
     text += `<tr><td>Cross-section model\t</td><td>${getEPAXCrossSection(obj)}</td><td></td></tr>`;
+    text += `<tr><td>Charge states\t</td><td>${obj["options"]["Charge states"]}</td><td><b>${checkChargeStates(obj)}</b></td></tr>`;
     text += `<tr><td>CentralCut\t</td><td>${getCentralCut(obj)}</td><td><b><a href="https://www.nishina.riken.jp/ribf/BigRIPS/intensity.html" target="_blank">${checkCentralCut(obj)}</b></a></td></tr>`;
     text += "</table>";
     text += `<pre>Beam dump calc.\t${beamDumpResults[1]}</pre>`;
@@ -422,6 +423,13 @@ function checkCentralCut(obj) {
     else{
         return 'Set to "NO"'
     }
+}
+
+function checkChargeStates(obj) {
+    if (obj["options"]["Charge states"] === "Yes") {
+        return "OK";
+    }
+    return 'Check "Charge states"';
 }
 
 function checkVersion(obj) {
